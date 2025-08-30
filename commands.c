@@ -19,11 +19,6 @@ void command_print_message()
     printf("Hoy comi perro\n");
 }
 
-void command_exit()
-{
-    line.state = STOP;
-}
-
 void command_print_arg()
 {
     char* arg = strtok(NULL, " ");
@@ -144,20 +139,19 @@ void command_print_date()
 void command_joke()
 {
     curl_global_init(CURL_GLOBAL_WIN32);
-
     CURL* handle = curl_easy_init();
-
     curl_easy_setopt(handle, CURLOPT_URL, "https://icanhazdadjoke.com/");
 
     struct curl_slist *headers = NULL;
    
     headers = curl_slist_append(headers, "Accept: text/plain");
-
     curl_easy_setopt(handle, CURLOPT_HTTPHEADER, headers);
-
     curl_easy_perform(handle);
-
     printf("\n");
-
     curl_global_cleanup();
+}
+
+void command_clear()
+{
+    system("cls");
 }

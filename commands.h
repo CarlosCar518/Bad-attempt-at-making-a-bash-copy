@@ -5,11 +5,6 @@
 #define RUNNING 1
 #define SUCCESS 0
 
-typedef struct {
-    char* buff;
-    int state;
-}flow_struct;
-
 typedef void (*cmd_fn)(void);
 
 void command_exit();
@@ -25,8 +20,6 @@ void command_help();
 void command_listFiles();
 void command_print_date();
 void command_joke();
-
-
-extern flow_struct line;
+void command_clear();
 
 #endif 

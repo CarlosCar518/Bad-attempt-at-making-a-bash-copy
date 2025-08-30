@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <conio.h>
 #include "commands.h"
 
 #define global_internal static
@@ -12,57 +13,85 @@ typedef struct {
     cmd_fn fn;
 }commands;
 
-flow_struct line;
+typedef struct {
+    char* buff;
+    int state;
+    size_t pos;
+}flow_struct;
 
 void read(flow_struct * st);
 void take_com(flow_struct st);
 int find_command(char* token);
+void add_char(flow_struct* st, char c);
 
 int main(void)
 {
-    char *buffer;
-    do
-    {
-        printf("?");
-        read(&line);
-        if (line.state == STOP)
-        {
-            return 0;
-        }
-        take_com(line);
-        if (line.state == STOP)
-            break;
-        free(line.buff);
-        
-    } while (1);
-    
+    flow_struct line;
+    read(&line);    
     return 0;
 }
 
 void read(flow_struct* st)
 {
     st->buff = NULL;
+    st->pos = 0;
+    size_t cmd_pos = 0;
     char c;
-    size_t size = 0;
+    printf("?");
 
-    while ((c = getchar()) != '\n' && c != EOF)
+    while (1)
     {
-        char *tmp = realloc(st->buff, size + 2);
-
-        if (tmp == NULL)
+        if (_kbhit())
         {
-            free(st->buff);
-            st->buff = NULL;
-            st->state = STOP;
-            return;
+            c = _getch();
+            if (cmd_pos == 0 && (c == '\b' || c == '\r'))
+            {
+                continue;
+            }
+
+            if (c == '\r')
+            {
+                st->pos = 0;
+                printf("\n");
+                if (strcmp(st->buff,"ex") == 0)
+                {
+                    return;
+                }
+                take_com(*st);
+                printf("?");
+                continue;
+            }
+            else if (c == '\b')
+            {
+                if (cmd_pos > 0)
+                {
+                    cmd_pos--;
+                    st->pos--;
+                    (st->buff)[st->pos] = '\0';
+                    printf("\b \b");
+                }
+                continue;
+            }
+            add_char(st, c);
+            printf("%c",c);
+            cmd_pos++;
         }
-
-        st->buff = tmp;
-        (st->buff)[size++] = c;
-        (st->buff)[size] = '\0';
     }
+}
 
-    st->state = c == EOF ? STOP : RUNNING; 
+void add_char(flow_struct* st, char c)
+{
+    char* tmp = realloc(st->buff, st->pos + 2);
+
+    if(!tmp)
+    {
+        free(st->buff);
+        free(tmp);
+        st->buff = NULL;
+    }
+    st->buff = tmp;
+    (st->buff)[st->pos++] = c;
+    (st->buff)[st->pos] = '\0';
 }
 
 void take_com(flow_struct st)
@@ -78,9 +107,9 @@ void take_com(flow_struct st)
 int find_command(char* token)
 {
     commands command_list[] = { {"lt" , command_print_serie}, {"pm", command_print_message},
-{"ex", command_exit} ,{"pr", command_print_arg}, {"rm", command_remove},{"pwd",command_wd},{"cd", command_change_dir},
+{"pr", command_print_arg}, {"rm", command_remove},{"pwd",command_wd},{"cd", command_change_dir},
 {"mkdir", command_make_dir},{"rmdir", command_remove_dir},{"help", command_help},{"dir",command_listFiles},{"time", command_print_date},
-{"jk", command_joke},{NULL, NULL}};
+{"jk", command_joke},{"clear", command_clear},{NULL, NULL}};
 
     for (int i = 0; command_list[i].name != NULL ;i++)
     {
