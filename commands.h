@@ -7,6 +7,15 @@
 
 typedef void (*cmd_fn)(void);
 
+char* return_fixed_current_path();
+
+typedef struct {
+    char* buff;
+    size_t pos;
+}flow_struct;
+
+void macro_autocomplete(char* prefix, flow_struct* st);
+
 void command_exit();
 void command_print_arg();
 void command_remove();
@@ -21,5 +30,6 @@ void command_listFiles();
 void command_print_date();
 void command_joke();
 void command_clear();
+
 
 #endif 

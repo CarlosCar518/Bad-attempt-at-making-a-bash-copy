@@ -13,12 +13,6 @@ typedef struct {
     cmd_fn fn;
 }commands;
 
-typedef struct {
-    char* buff;
-    int state;
-    size_t pos;
-}flow_struct;
-
 void read(flow_struct * st);
 void take_com(flow_struct st);
 int find_command(char* token);
@@ -33,6 +27,7 @@ int main(void)
 
 void read(flow_struct* st)
 {
+    char* possible_aut = NULL;
     st->buff = NULL;
     st->pos = 0;
     size_t cmd_pos = 0;
@@ -46,6 +41,15 @@ void read(flow_struct* st)
             c = _getch();
             if (cmd_pos == 0 && (c == '\b' || c == '\r'))
             {
+                continue;
+            }
+
+            if (c == '\t')
+            {
+                possible_aut = (strrchr(st->buff, ' '));
+                possible_aut = (possible_aut == NULL) ? st->buff : possible_aut + 1;
+
+                macro_autocomplete(possible_aut, st);
                 continue;
             }
 
