@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <direct.h>
-#include <curl/curl.h>
 #include <time.h>
 #include <sys/types.h>
 
@@ -128,7 +127,7 @@ void command_print_date()
 
     printf("%s\n",ctime(&currentTime));
 }
-
+/*
 void command_joke()
 {
     curl_global_init(CURL_GLOBAL_WIN32);
@@ -142,9 +141,9 @@ void command_joke()
     curl_easy_perform(handle);
     printf("\n");
     curl_global_cleanup();
-}
+}*/
 
 void command_clear()
 {
-    printf("\x1b[2J");
+    printf("\x1b[2J\x1b[0;0f");
 }

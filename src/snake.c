@@ -16,11 +16,8 @@ typedef struct
     int dx,dy;
 }Snake;
 
-
 static HANDLE wHndIn;
 static HANDLE wHndOut;
-
-
 
 void _Smain()
 {
@@ -48,23 +45,25 @@ void _Smain()
 
                 if (key == 'w')
                 {
-                    printf("\x1b[2J\x1b[%i;%iH*",sn.dy,sn.dx);
                     sn.dy--;
+                    printf("\x1b[2J\x1b[%i;%iH*",sn.dy,sn.dx);
+                    
                 }
                 else if (key == 'a')
                 {
+                    sn.dx--;
                     printf("\x1b[2J\x1b[%i;%iH*",sn.dy,sn.dx);
-                    sn.dx--;                    
+                    
                 }
                 else if( key == 's')
                 {
-                    printf("\x1b[2J\x1b[%i;%iH*",sn.dy,sn.dx);
                     sn.dy++;
+                    printf("\x1b[2J\x1b[%i;%iH*",sn.dy,sn.dx);
                 }
                 else if ( key == 'd')
                 {
-                    printf("\x1b[2J\x1b[%i;%iH*",sn.dy,sn.dx);
                     sn.dx++;
+                    printf("\x1b[2J\x1b[%i;%iH*",sn.dy,sn.dx);
                 }
                 
                 if ( key == 'p')
@@ -74,7 +73,5 @@ void _Smain()
                 break;
             }
         }
-    }  
-
-    
+    }     
 }

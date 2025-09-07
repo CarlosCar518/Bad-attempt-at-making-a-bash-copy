@@ -3,6 +3,8 @@
 #include <string.h>
 #include <windows.h>
 #include <dirent.h>
+#include <sys/types.h>
+
 #include "../include/commands.h"
 
 #define KEY_TAB '\t'
@@ -34,6 +36,7 @@ internal void ShellKeyEvent(char key, flow_struct *line);
 internal void error_exit(char* error);
 internal void ShellKeyEnter(flow_struct *line);
 internal void buffer_delete_char(flow_struct *line);
+internal void print_cwd();
 internal void init_console();
 
 
@@ -44,6 +47,22 @@ internal void init_console();
 * `exec <programa>` → ejecutar un programa externo (tipo Bash).
 */
 
+
+
+/*  FEW BUGS:
+* ShellTakeCommand is not tokenazing correctly. At first I thought it was the functions fault, but it turns out it is not.
+* For some reason with alt-char I get errors, for instances if I type main_shell ignores shell, it is like takes_ as and end
+* it does this with every alt-something char. The buff is not saving the alt-somethin and further chars.
+*
+*
+* I first I thought there were more bugs related to commands, but I am preaty sure all of them derive from the buff error.
+*
+*
+* The program crashes randomly, I do not know why. Not sure if it is realted to the buff problem
+*
+* When I reach the bottom of the screen the spaces betwen commands is ignored, all the lines are continues, no spaces beetwen them.
+* I have no idea why this happens, may be something with power shell or something.
+*/
 global_internal commands buff_commands[] = { 
     {"lt" , command_print_serie}, 
     {"pm", command_print_message},
@@ -56,13 +75,15 @@ global_internal commands buff_commands[] = {
     {"help", command_help},
     {"dir",command_listFiles},
     {"time", command_print_date},
-    {"jk", command_joke},
     {"clear", command_clear},
     {"snake", _Smain},
     {NULL, NULL}};
 
 int main(void)
 {
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+
     flow_struct line = {NULL, 0, 0};
     ShellEx(&line);    
     return 0;
@@ -76,7 +97,10 @@ internal void ShellEx(flow_struct* st)
     init_console();
 
     running = 1;
-    printf("~");
+
+    printf("\x1b[2J\x1b[0;0f");
+    print_cwd();
+    printf("\x1b[0m\x1b[33m∑ \x1b[0m");
     while (running)
     {
         if (! ReadConsoleInput(wHndIn, irInBuf, 128, &cNumRead))
@@ -153,8 +177,7 @@ internal void ShellKeyEvent(char key, flow_struct *line)
                 printf("%c",key);
             else
                 printf("\x1b[1@%c",key);
-        }break;
-        
+        }break;  
     }
 }
 
@@ -177,6 +200,22 @@ internal void ShellKeyEventArrow(WORD key,flow_struct *line)
     default:
         break;
     }
+}
+
+internal void ShellKeyEnter(flow_struct *line)
+{
+    if (line->pos == 0)
+        return;
+
+    printf("\n");
+    ShellTakeCommand(*line);
+    printf("\n");
+    print_cwd();
+    printf("\x1b[0m\x1b[33m∑ \x1b[0m\x1b[s");
+
+    line->pos = 0;
+    line->cursor = 0;
+    line->buff[0] = '\0';
 }
 
 internal void buffer_add_char(flow_struct* st, char c)
@@ -251,6 +290,7 @@ internal void buffer_delete_char(flow_struct *line)
 
 internal void ShellTakeCommand(flow_struct st)
 {
+    printf("%s\n",st.buff);
     int i;
     char* token = strtok(st.buff, " ");
     do
@@ -267,34 +307,7 @@ internal void ShellTakeCommand(flow_struct st)
     } while ((token = strtok(NULL, " ")));
 }
 
-internal void ShellKeyEnter(flow_struct *line)
-{
-    if (line->pos == 0)
-        return;
 
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-
-    if (!GetConsoleScreenBufferInfo(wHndOut, &csbi))
-    {
-        printf("GetConsoleScreenBufferInfo failed %ld\n", GetLastError());
-        return;
-    }
-    
-    if ((csbi.srWindow.Bottom - 2) <= csbi.dwCursorPosition.Y)
-    {
-        
-        printf("\x1b[3S");
-        printf("\x1b[u\x1b[3A");
-    }
- 
-    printf("\x1b[1E");
-    ShellTakeCommand(*line);
-    printf("\x1b[1E~\x1b[s");
-
-    line->pos = 0;
-    line->cursor = 0;
-    line->buff[0] = '\0';
-}
 
 
 /*-------------------------------WINDOWS STUFF-----------------------------------------*/
@@ -309,8 +322,9 @@ internal void error_exit(char* error)
 
 internal void init_console()
 {
-    DWORD fwMode;
-
+    DWORD fwModeIn;
+    DWORD fwModeOut;
+    
     wHndIn = GetStdHandle(STD_INPUT_HANDLE);
     if (wHndIn == INVALID_HANDLE_VALUE)
     {
@@ -324,21 +338,35 @@ internal void init_console()
         error_exit("GetStdHandle");
     }
 
-    if(!GetConsoleMode(wHndIn, &fdwSaveOldMode))
+    if(!GetConsoleMode(wHndIn, &fwModeIn))
     {
         error_exit("GetConsoleMode");
     }
 
-    fwMode = (ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS) & ~ENABLE_QUICK_EDIT_MODE;
-    if (!SetConsoleMode(wHndIn, fwMode))
+    fwModeIn = (ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS) & ~ENABLE_QUICK_EDIT_MODE;
+    if (!SetConsoleMode(wHndIn, fwModeIn))
     {
         error_exit("SetConsoleMode");
     }
+ 
+    if(!GetConsoleMode(wHndOut, &fwModeOut))
+    {
+        error_exit("GetConsoleMode");
+    }
 
-    fwMode = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
-    if (!SetConsoleMode(wHndOut,fwMode))
+    fwModeOut |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+
+    if (!SetConsoleMode(wHndOut,fwModeOut))
     {
         error_exit("SetConsoleMode");
     }
+}
+
+internal void print_cwd()
+{
+    char* cwd;
+    cwd = getcwd(NULL, 0);
+
+    printf("\x1b[0m\x1b[32m<%s>\x1b[0m\n",cwd);
 }
