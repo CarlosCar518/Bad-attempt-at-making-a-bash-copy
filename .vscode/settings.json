@@ -16,6 +16,7 @@
         "windows.h": "c",
         "commands.h": "c",
         "stdlib.h": "c",
-        "dirent.h": "c"
+        "dirent.h": "c",
+        "time.h": "c"
     }
 }

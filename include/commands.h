@@ -30,6 +30,9 @@ void command_listFiles();
 void command_print_date();
 void command_clear();
 void _Smain();
+void command_readFile();
+void command_execute();
+void command_vim();
 
 
 

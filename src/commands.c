@@ -147,3 +147,40 @@ void command_clear()
 {
     printf("\x1b[2J\x1b[0;0f");
 }
+
+void command_readFile()
+{
+    char* token = strtok(NULL, " ");
+    FILE *f = fopen(token, "r");
+    if (!f)
+    {
+        perror("fopen");
+        return;
+    }
+
+    int c;
+    while ((c = fgetc(f)) != EOF) putchar(c);
+    fclose(f);
+}
+
+void command_execute()
+{
+    char* token = strtok(NULL, " ");
+    int status = system(token);
+    if (status)
+    {
+        printf("Wrong argument\n");
+    }
+}
+
+void command_vim()
+{
+    char* token = strtok(NULL, " ");
+    char* command = "C:/Program Files/Git/usr/bin/vim.exe";
+    int status = system("C:\\PROGRA~1\\Git\\usr\\bin\\vim.exe");
+    if (status)
+    {
+        printf("Vim error");
+    }
+    command_clear();
+}

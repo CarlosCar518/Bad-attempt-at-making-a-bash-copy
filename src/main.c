@@ -41,28 +41,11 @@ internal void init_console();
 
 
 /*
-* `cat <archivo>` → mostrar contenido de un archivo.
+* 
 * `grep <palabra> <archivo>` → buscar palabras en un archivo.
 * `history` → mostrar los últimos comandos ejecutados.
-* `exec <programa>` → ejecutar un programa externo (tipo Bash).
 */
 
-
-
-/*  FEW BUGS:
-* ShellTakeCommand is not tokenazing correctly. At first I thought it was the functions fault, but it turns out it is not.
-* For some reason with alt-char I get errors, for instances if I type main_shell ignores shell, it is like takes_ as and end
-* it does this with every alt-something char. The buff is not saving the alt-somethin and further chars.
-*
-*
-* I first I thought there were more bugs related to commands, but I am preaty sure all of them derive from the buff error.
-*
-*
-* The program crashes randomly, I do not know why. Not sure if it is realted to the buff problem
-*
-* When I reach the bottom of the screen the spaces betwen commands is ignored, all the lines are continues, no spaces beetwen them.
-* I have no idea why this happens, may be something with power shell or something.
-*/
 global_internal commands buff_commands[] = { 
     {"lt" , command_print_serie}, 
     {"pm", command_print_message},
@@ -77,6 +60,9 @@ global_internal commands buff_commands[] = {
     {"time", command_print_date},
     {"clear", command_clear},
     {"snake", _Smain},
+    {"cat", command_readFile},
+    {"exec",command_execute},
+    {"vim", command_vim},
     {NULL, NULL}};
 
 int main(void)
@@ -136,7 +122,8 @@ internal void ShellKeyMain(KEY_EVENT_RECORD ker, flow_struct *line)
             return;
         }
         
-        ShellKeyEvent(key_pressed, line);
+        if (ker.uChar.AsciiChar != 0)
+            ShellKeyEvent(key_pressed, line);
 
     }
 }
@@ -243,7 +230,6 @@ internal void buffer_add_char(flow_struct* st, char c)
         return;
     }
 
-
     char* tmp = realloc(st->buff, st->pos + 2);
 
     if(!tmp)
@@ -299,16 +285,13 @@ internal void ShellTakeCommand(flow_struct st)
             ;
         if (buff_commands[i].name == NULL)
         {
-            printf("Command %s is not valid\x1b[1E", token);
+            printf("Command %s is not valid\n", token);
             return;
         }
         else
             buff_commands[i].fn();     
     } while ((token = strtok(NULL, " ")));
 }
-
-
-
 
 /*-------------------------------WINDOWS STUFF-----------------------------------------*/
 internal void error_exit(char* error)
