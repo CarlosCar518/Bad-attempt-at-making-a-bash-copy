@@ -6,31 +6,33 @@
 #include "../include/commands.h"
 #include "../include/dirent.h"
 
-void dir_complete(flow_struct* st)
+void dir_complete(flow_struct *st)
 {
     if (st->pos == 0)
         return;
 
-    char* prefix = NULL;
-
+    char *prefix = NULL;
+    /*Encuentro ultimo token. Si no hay token  igualo al buffer*/
     prefix = (strrchr(st->buff, ' '));
     prefix = (prefix == NULL) ? st->buff : prefix + 1;
 
     size_t prefix_len = strlen(prefix);
 
     DIR *dir = opendir(".");
-    if(!dir)
+    if (!dir)
         printf("Error");
-    
+
     struct dirent *ent;
     while ((ent = readdir(dir)) != NULL)
     {
-        if(strnicmp(ent->d_name, prefix, prefix_len) == 0)
+        /*Itero sobre la carpeta hasta encontrar coincidencia*/
+        if (strnicmp(ent->d_name, prefix, prefix_len) == 0)
         {
             int i;
+            /*Puntero al primer char donde NO coinciden*/
             for (i = 0; prefix[i] == ent->d_name[i]; i++)
                 ;
-            printf("%s",&ent->d_name[i]);
+            printf("%s", &ent->d_name[i]);
             break;
         }
     }
@@ -40,6 +42,7 @@ void dir_complete(flow_struct* st)
         closedir(dir);
         return;
     }
+    /*Añado al buffer el resto de chars*/
 
     size_t diference = (strlen(ent->d_name) - strlen(prefix));
     char *temp = realloc(st->buff, (st->pos) + diference + 1);
@@ -50,22 +53,22 @@ void dir_complete(flow_struct* st)
         return;
     }
     st->buff = temp;
-    char* last_token = strrchr(st->buff, ' ');
+    char *last_token = strrchr(st->buff, ' ');
 
     if (last_token)
         prefix = last_token + 1;
     else
         prefix = st->buff;
-    
+
     strcpy(prefix, ent->d_name);
     st->pos = strlen(st->buff);
 
     closedir(dir);
 }
 
-char* return_fixed_current_path()
+char *return_fixed_current_path()
 {
-    char* path = _getcwd(NULL, 0);
+    char *path = _getcwd(NULL, 0);
     int pathLen = strlen(path);
 
     path = realloc(path, pathLen + 3);

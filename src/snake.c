@@ -59,10 +59,8 @@ void _Smain()
 
     while (running)
     {
-
         if (PeekConsoleInput(wHndIn, irInBuf, 128, &cNumRead) && cNumRead > 0)
         {
-
             if (!ReadConsoleInput(wHndIn, irInBuf, 128, &cNumRead))
             {
                 return;
@@ -94,9 +92,9 @@ void _Smain()
                         sn.dx = 1;
                         sn.dy = 0;
                     }
-
-                    if (key == 'p')
+                    else if (key == 'p')
                         running = 0;
+                    break;
 
                 default:
                     break;

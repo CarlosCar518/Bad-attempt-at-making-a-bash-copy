@@ -282,7 +282,6 @@ internal void buffer_delete_char(flow_struct *line)
 
 internal void ShellTakeCommand(flow_struct st)
 {
-    printf("%s\n", st.buff);
     int i;
     char *token = strtok(st.buff, " ");
     do

@@ -10,7 +10,7 @@
 
 void command_print_serie()
 {
-    for(int i = 1; i <= 100; i++)
+    for (int i = 1; i <= 100; i++)
         printf("%d\n", i);
 }
 
@@ -21,14 +21,16 @@ void command_print_message()
 
 void command_print_arg()
 {
-    char* arg = strtok(NULL, " ");
+    char *arg = strtok(NULL, "");
+    if (arg == NULL)
+        printf("You need to need to say something");
 
     printf("The user said %s\n", arg);
 }
 
 void command_remove()
 {
-    char* arg = strtok(NULL, " ");
+    char *arg = strtok(NULL, " ");
 
     if (!arg)
     {
@@ -46,11 +48,11 @@ void command_remove()
 
 void command_print_currentWorkingDir()
 {
-    char* pwd = _getcwd(NULL, 0);
+    char *pwd = _getcwd(NULL, 0);
 
     if (pwd != NULL)
     {
-        printf("%s\n",pwd);
+        printf("%s\n", pwd);
         free(pwd);
         return;
     }
@@ -60,17 +62,17 @@ void command_print_currentWorkingDir()
 
 void command_change_dir()
 {
-    char* token = strtok(NULL, " ");
+    char *token = strtok(NULL, " ");
 
-    if(_chdir(token))
+    if (_chdir(token))
     {
-        printf("Path not found\n"); 
+        printf("Path not found\n");
     }
 }
 
 void command_make_dir()
 {
-    char* token = strtok(NULL, " ");
+    char *token = strtok(NULL, " ");
 
     if (_mkdir(token))
     {
@@ -80,7 +82,7 @@ void command_make_dir()
 
 void command_remove_dir()
 {
-    char* token = strtok(NULL, " ");
+    char *token = strtok(NULL, " ");
 
     if (rmdir(token))
     {
@@ -107,9 +109,9 @@ void command_listFiles()
 
     struct dirent *ent;
 
-    while( (ent = readdir(dir)) != NULL)
+    while ((ent = readdir(dir)) != NULL)
     {
-        if ((strcmp(ent->d_name, ".")) == 0  ||  (strcmp(ent->d_name, "..")) == 0)
+        if ((strcmp(ent->d_name, ".")) == 0 || (strcmp(ent->d_name, "..")) == 0)
         {
             continue;
         }
@@ -125,7 +127,7 @@ void command_print_date()
     time_t currentTime;
     time(&currentTime);
 
-    printf("%s\n",ctime(&currentTime));
+    printf("%s\n", ctime(&currentTime));
 }
 /*
 void command_joke()
@@ -135,7 +137,7 @@ void command_joke()
     curl_easy_setopt(handle, CURLOPT_URL, "https://icanhazdadjoke.com/");
 
     struct curl_slist *headers = NULL;
-   
+
     headers = curl_slist_append(headers, "Accept: text/plain");
     curl_easy_setopt(handle, CURLOPT_HTTPHEADER, headers);
     curl_easy_perform(handle);
@@ -150,7 +152,7 @@ void command_clear()
 
 void command_readFile()
 {
-    char* token = strtok(NULL, " ");
+    char *token = strtok(NULL, " ");
     FILE *f = fopen(token, "r");
     if (!f)
     {
@@ -159,13 +161,14 @@ void command_readFile()
     }
 
     int c;
-    while ((c = fgetc(f)) != EOF) putchar(c);
+    while ((c = fgetc(f)) != EOF)
+        putchar(c);
     fclose(f);
 }
 
 void command_execute()
 {
-    char* token = strtok(NULL, " ");
+    char *token = strtok(NULL, " ");
     int status = system(token);
     if (status)
     {
@@ -175,8 +178,8 @@ void command_execute()
 
 void command_vim()
 {
-    char* token = strtok(NULL, " ");
-    char* command = "C:/Program Files/Git/usr/bin/vim.exe";
+    char *token = strtok(NULL, " ");
+    char *command = "C:/Program Files/Git/usr/bin/vim.exe";
     int status = system("C:\\PROGRA~1\\Git\\usr\\bin\\vim.exe");
     if (status)
     {
