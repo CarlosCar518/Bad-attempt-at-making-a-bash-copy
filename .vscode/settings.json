@@ -1,9 +1,22 @@
 {
-    "C_Cpp.errorSquiggles": "disabled",
+    "terminal.integrated.defaultProfile.windows": "Git Bash",
+    "terminal.integrated.profiles.windows": {
+        "Git Bash": {
+            "path": "C:\\msys64\\usr\\bin\\bash.exe",
+            "args": ["--login", "-i"],
+            "env": {
+                "MSYSTEM": "MINGW64",
+                "CHERE_INVOKING": "1"
+            }
+        }
+    },
     "files.associations": {
-        "direct.h": "c",
+        "string.h": "c",
         "stdio.h": "c",
+        "windows.h": "c",
         "commands.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "dirent.h": "c",
+        "time.h": "c"
     }
 }

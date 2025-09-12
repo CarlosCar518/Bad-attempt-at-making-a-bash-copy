@@ -2,15 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <direct.h>
-#include <curl/curl.h>
-#include <Windows.h>
 #include <time.h>
+#include <sys/types.h>
 
-#include "commands.h"
+#include "../include/dirent.h"
+#include "../include/commands.h"
 
 void command_print_serie()
 {
-    for(int i = 1; i <= 100; i++)
+    for (int i = 1; i <= 100; i++)
         printf("%d\n", i);
 }
 
@@ -21,14 +21,16 @@ void command_print_message()
 
 void command_print_arg()
 {
-    char* arg = strtok(NULL, " ");
+    char *arg = strtok(NULL, "");
+    if (arg == NULL)
+        printf("You need to need to say something");
 
     printf("The user said %s\n", arg);
 }
 
 void command_remove()
 {
-    char* arg = strtok(NULL, " ");
+    char *arg = strtok(NULL, " ");
 
     if (!arg)
     {
@@ -44,13 +46,13 @@ void command_remove()
     }
 }
 
-void command_wd()
+void command_print_currentWorkingDir()
 {
-    char* pwd = _getcwd(NULL, 0);
+    char *pwd = _getcwd(NULL, 0);
 
     if (pwd != NULL)
     {
-        printf("%s\n",pwd);
+        printf("%s\n", pwd);
         free(pwd);
         return;
     }
@@ -60,17 +62,17 @@ void command_wd()
 
 void command_change_dir()
 {
-    char* token = strtok(NULL, " ");
+    char *token = strtok(NULL, " ");
 
-    if(_chdir(token))
+    if (_chdir(token))
     {
-        printf("Path not found\n"); 
+        printf("Path not found\n");
     }
 }
 
 void command_make_dir()
 {
-    char* token = strtok(NULL, " ");
+    char *token = strtok(NULL, " ");
 
     if (_mkdir(token))
     {
@@ -80,7 +82,7 @@ void command_make_dir()
 
 void command_remove_dir()
 {
-    char* token = strtok(NULL, " ");
+    char *token = strtok(NULL, " ");
 
     if (rmdir(token))
     {
@@ -99,33 +101,25 @@ void command_help()
 
 void command_listFiles()
 {
-    //I get the cwd and adjust it adding \* in order to get all the files and meet the Win API specifications
-    char* path = _getcwd(NULL, 0);
-    int pathLen = strlen(path);
-
-    path = realloc(path, pathLen + 3);
-
-    path[pathLen++] = '\\';
-    path[pathLen++] = '*';
-    path[pathLen] = '\0';
-
-    WIN32_FIND_DATAA pathData;
-    HANDLE hFind;
-
-    if ((hFind = FindFirstFile(path, &pathData)) == INVALID_HANDLE_VALUE )
+    DIR *dir = opendir(".");
+    if (!dir)
     {
-        printf("Erorr\n");
+        printf("Error");
     }
 
-    while (FindNextFile(hFind, &pathData))
+    struct dirent *ent;
+
+    while ((ent = readdir(dir)) != NULL)
     {
-        if (strcmp(pathData.cFileName, ".") == 0 || strcmp(pathData.cFileName, "..") == 0 )
+        if ((strcmp(ent->d_name, ".")) == 0 || (strcmp(ent->d_name, "..")) == 0)
+        {
             continue;
-        printf("%s\n", pathData.cFileName);
-    }
+        }
 
-    FindClose(hFind);
-    free(path);
+        printf("%s  ", ent->d_name);
+    }
+    printf("\n");
+    closedir(dir);
 }
 
 void command_print_date()
@@ -133,9 +127,9 @@ void command_print_date()
     time_t currentTime;
     time(&currentTime);
 
-    printf("%s\n",ctime(&currentTime));
+    printf("%s\n", ctime(&currentTime));
 }
-
+/*
 void command_joke()
 {
     curl_global_init(CURL_GLOBAL_WIN32);
@@ -143,15 +137,53 @@ void command_joke()
     curl_easy_setopt(handle, CURLOPT_URL, "https://icanhazdadjoke.com/");
 
     struct curl_slist *headers = NULL;
-   
+
     headers = curl_slist_append(headers, "Accept: text/plain");
     curl_easy_setopt(handle, CURLOPT_HTTPHEADER, headers);
     curl_easy_perform(handle);
     printf("\n");
     curl_global_cleanup();
-}
+}*/
 
 void command_clear()
 {
-    system("cls");
+    printf("\x1b[2J\x1b[0;0f");
+}
+
+void command_readFile()
+{
+    char *token = strtok(NULL, " ");
+    FILE *f = fopen(token, "r");
+    if (!f)
+    {
+        perror("fopen");
+        return;
+    }
+
+    int c;
+    while ((c = fgetc(f)) != EOF)
+        putchar(c);
+    fclose(f);
+}
+
+void command_execute()
+{
+    char *token = strtok(NULL, " ");
+    int status = system(token);
+    if (status)
+    {
+        printf("Wrong argument\n");
+    }
+}
+
+void command_vim()
+{
+    char *token = strtok(NULL, " ");
+    char *command = "C:/Program Files/Git/usr/bin/vim.exe";
+    int status = system("C:\\PROGRA~1\\Git\\usr\\bin\\vim.exe");
+    if (status)
+    {
+        printf("Vim error");
+    }
+    command_clear();
 }
