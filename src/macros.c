@@ -61,7 +61,7 @@ void dir_complete(flow_struct *st)
         prefix = st->buff;
 
     strcpy(prefix, ent->d_name);
-    st->pos = strlen(st->buff);
+    st->pos = st->cursor = strlen(st->buff);
 
     closedir(dir);
 }

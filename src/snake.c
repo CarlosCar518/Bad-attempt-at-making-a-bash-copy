@@ -20,9 +20,13 @@ typedef struct
 
 static HANDLE wHndIn;
 static HANDLE wHndOut;
+void lost();
+
+int running = 1;
 
 void _Smain()
 {
+    running = 1;
     printf("\x1b[?1049h\x1b[?25l");
 
     Snake sn = {0};
@@ -51,8 +55,6 @@ void _Smain()
     Point r = {ran0, ran1};
 
     int points = 0;
-
-    int running = 1;
 
     printf("\x1b[2J\x1b[0;0f");
     printf("\x1b[%i;%i\x1b[1m\x1b[34mSCORE: \x1b[0m\x1b[s", 8, 8);
@@ -93,7 +95,10 @@ void _Smain()
                         sn.dy = 0;
                     }
                     else if (key == 'p')
+                    {
                         running = 0;
+                        lost();
+                    }
                     break;
 
                 default:
@@ -116,6 +121,10 @@ void _Smain()
             Sleep(60);
         else
             Sleep(120);
+
+        for (int i = 1; i < sn.lenght; i++)
+            if (head->x == sn.body[i].x && head->y == sn.body[i].y)
+                lost();
 
         if (head->y == r.y && head->x == r.x)
         {
@@ -140,4 +149,17 @@ void _Smain()
         printf("\x1b[%i;%iH*", head->y, head->x);
     }
     printf("\x1b[?1049l");
+}
+
+void lost()
+{
+    printf("\x1b[2J\x1b[0;0f\x1b[31m");
+    printf("____    ____  ______    __    __      __       ______       _______.___________.\n");
+    printf("\\   \\  /   //  __  \\  |  |  |  |    |  |      /  __  \\     /       |           |   \n");
+    printf("\\   \\/   / |  |  |  | |  |  |  |    |  |     |  |  |  |    |   (----`---|  |----`   \n");
+    printf(" \\_    _/  |  |  |  | |  |  |  |    |  |     |  |  |  |     \\   \\       |  |        \n");
+    printf("   |  |    |  `--'  | |  `--'  |    |  `----.|  `--'  | .----)   |      |  |        \n");
+    printf("   |__|     \\______/   \\______/     |_______| \\______/  |_______/       |__|        \x1b[0m\n");
+    Sleep(2000);
+    running = 0;
 }

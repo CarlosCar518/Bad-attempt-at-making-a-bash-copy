@@ -146,9 +146,6 @@ internal void ShellKeyEvent(char key, flow_struct *line)
 
     case KEY_TAB:
     {
-        char *possible_aut = (strrchr(line->buff, ' '));
-        possible_aut = (possible_aut == NULL) ? line->buff : possible_aut + 1;
-
         dir_complete(line);
     }
     break;
