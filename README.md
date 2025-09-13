@@ -1,3 +1,7 @@
+                     --Probably I will stop updating for a while. I think I have done enough for now and wanna do something differente--
+
+--Now it can open executables from PATH with the PATHEXE.
+
 --Full inline editing added. Now its no only visual, the buffer changes too. I have not found bugs yet.
 
 --Improved a lot the stetic of the console, now kind of looks like a serious console.
