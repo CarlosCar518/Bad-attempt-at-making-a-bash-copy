@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Windows.h>
+#include <io.h>
 
 #include "../include/commands.h"
 #include "../include/dirent.h"
@@ -64,6 +65,47 @@ void dir_complete(flow_struct *st)
     st->pos = st->cursor = strlen(st->buff);
 
     closedir(dir);
+}
+
+int run_PATH(char *program)
+{
+    char *context1, *context2;
+
+    char *path = strdup(getenv("PATH"));
+    char *pathext = strdup(getenv("PATHEXT"));
+    char *dirPath = strtok_s(path, ";", &context1);
+
+    char pathExtCopy[256];
+    char final[1000];
+    char programName[256];
+
+    while (dirPath)
+    {
+
+        strcpy(pathExtCopy, pathext);
+        char *ext = strtok_s(pathExtCopy, ";", &context2);
+
+        while (ext)
+        {
+            strcpy(programName, program);
+            strcat(programName, ext);
+            snprintf(final, 1000, "%s%c%s", dirPath, '\\', programName);
+
+            if (!_access(final, 0))
+            {
+                system(final);
+                free(path);
+                free(pathext);
+                return 0;
+            }
+            ext = strtok_s(NULL, ";", &context2);
+        }
+
+        dirPath = strtok_s(NULL, ";", &context1);
+    }
+    free(path);
+    free(pathext);
+    return 1;
 }
 
 char *return_fixed_current_path()

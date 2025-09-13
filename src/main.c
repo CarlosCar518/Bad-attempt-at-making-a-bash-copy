@@ -27,6 +27,7 @@ global_internal HANDLE wHndIn;
 global_internal HANDLE wHndOut;
 global_internal DWORD fdwSaveOldMode;
 global_internal int running;
+global_internal char *history;
 
 internal void ShellEx(flow_struct *st);
 internal void ShellTakeCommand(flow_struct st);
@@ -62,7 +63,6 @@ global_internal commands buff_commands[] = {
     {"snake", _Smain},
     {"cat", command_readFile},
     {"exec", command_execute},
-    {"vim", command_vim},
     {NULL, NULL}};
 
 int main(void)
@@ -280,6 +280,7 @@ internal void buffer_delete_char(flow_struct *line)
 internal void ShellTakeCommand(flow_struct st)
 {
     int i;
+    char *isPath = (strrchr(st.buff, ' '));
     char *token = strtok(st.buff, " ");
     do
     {
@@ -287,11 +288,18 @@ internal void ShellTakeCommand(flow_struct st)
             ;
         if (buff_commands[i].name == NULL)
         {
+            if (!isPath)
+            {
+                int result = run_PATH(st.buff);
+                if (!result)
+                    return;
+            }
             printf("Command %s is not valid\n", token);
             return;
         }
         else
             buff_commands[i].fn();
+
     } while ((token = strtok(NULL, " ")));
 }
 

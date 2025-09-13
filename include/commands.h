@@ -7,15 +7,16 @@
 
 typedef void (*cmd_fn)(void);
 
-char* return_fixed_current_path();
+char *return_fixed_current_path();
 
-typedef struct {
-    char* buff;
+typedef struct
+{
+    char *buff;
     size_t pos;
     size_t cursor;
-}flow_struct;
+} flow_struct;
 
-void dir_complete(flow_struct* st);
+void dir_complete(flow_struct *st);
 
 void command_print_arg();
 void command_remove();
@@ -32,8 +33,6 @@ void command_clear();
 void _Smain();
 void command_readFile();
 void command_execute();
-void command_vim();
+int run_PATH(char *program);
 
-
-
-#endif 
+#endif

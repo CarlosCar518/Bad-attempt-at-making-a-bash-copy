@@ -122,6 +122,13 @@ void _Smain()
         else
             Sleep(120);
 
+        if (head->x > consoleCords.Right || head->x < consoleCords.Left ||
+            head->y > consoleCords.Bottom || head->y < consoleCords.Top)
+        {
+            lost();
+            return;
+        }
+
         for (int i = 1; i < sn.lenght; i++)
             if (head->x == sn.body[i].x && head->y == sn.body[i].y)
                 lost();

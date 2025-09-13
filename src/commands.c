@@ -129,21 +129,6 @@ void command_print_date()
 
     printf("%s\n", ctime(&currentTime));
 }
-/*
-void command_joke()
-{
-    curl_global_init(CURL_GLOBAL_WIN32);
-    CURL* handle = curl_easy_init();
-    curl_easy_setopt(handle, CURLOPT_URL, "https://icanhazdadjoke.com/");
-
-    struct curl_slist *headers = NULL;
-
-    headers = curl_slist_append(headers, "Accept: text/plain");
-    curl_easy_setopt(handle, CURLOPT_HTTPHEADER, headers);
-    curl_easy_perform(handle);
-    printf("\n");
-    curl_global_cleanup();
-}*/
 
 void command_clear()
 {
@@ -174,16 +159,4 @@ void command_execute()
     {
         printf("Wrong argument\n");
     }
-}
-
-void command_vim()
-{
-    char *token = strtok(NULL, " ");
-    char *command = "C:/Program Files/Git/usr/bin/vim.exe";
-    int status = system("C:\\PROGRA~1\\Git\\usr\\bin\\vim.exe");
-    if (status)
-    {
-        printf("Vim error");
-    }
-    command_clear();
 }
