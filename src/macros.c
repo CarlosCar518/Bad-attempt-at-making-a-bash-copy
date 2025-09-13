@@ -70,14 +70,15 @@ void dir_complete(flow_struct *st)
 int run_PATH(char *program)
 {
     char *context1, *context2;
+    size_t size = 256;
 
     char *path = strdup(getenv("PATH"));
     char *pathext = strdup(getenv("PATHEXT"));
     char *dirPath = strtok_s(path, ";", &context1);
 
-    char pathExtCopy[256];
-    char final[1000];
-    char programName[256];
+    char pathExtCopy[size];
+    char final[size];
+    char programName[size];
 
     while (dirPath)
     {
@@ -89,7 +90,7 @@ int run_PATH(char *program)
         {
             strcpy(programName, program);
             strcat(programName, ext);
-            snprintf(final, 1000, "%s%c%s", dirPath, '\\', programName);
+            snprintf(final, size, "%s%c%s", dirPath, '\\', programName);
 
             if (!_access(final, 0))
             {

@@ -27,7 +27,7 @@ global_internal HANDLE wHndIn;
 global_internal HANDLE wHndOut;
 global_internal DWORD fdwSaveOldMode;
 global_internal int running;
-global_internal char *history;
+global_internal char *history = NULL;
 
 internal void ShellEx(flow_struct *st);
 internal void ShellTakeCommand(flow_struct st);
@@ -39,6 +39,7 @@ internal void error_exit(char *error);
 internal void ShellKeyEnter(flow_struct *line);
 internal void buffer_delete_char(flow_struct *line);
 internal void print_cwd();
+void AddCommandHistory(char *command);
 internal void init_console();
 
 /*
@@ -298,9 +299,31 @@ internal void ShellTakeCommand(flow_struct st)
             return;
         }
         else
+        {
+            AddCommandHistory(token);
             buff_commands[i].fn();
+        }
 
     } while ((token = strtok(NULL, " ")));
+}
+
+void AddCommandHistory(char *command)
+{
+
+    if (history == NULL)
+    {
+        history = command;
+        return;
+    }
+
+    char fixed_command[256];
+    size_t size = strlen(command) + strlen(history);
+    history = (char *)(realloc(history, size));
+
+    snprintf(fixed_command, size, ";%s", command);
+    strcat(history, fixed_command);
+
+    printf("%s", history);
 }
 
 /*-------------------------------WINDOWS STUFF-----------------------------------------*/
